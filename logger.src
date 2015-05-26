@@ -1,0 +1,146 @@
+
+
+
+typedef unsigned int size_t;
+typedef struct {
+int	_file;			int	_flag;			unsigned _bufsiz;		char	*_ptr;			int	_cnt;			char	*_base;		} FILE;
+extern	FILE _files[32];
+FILE *fopen(char *name, char *mode);
+int   fclose(FILE *fp);
+int   fread(void *buf, int sizelem, int n, FILE *fp);
+int   fwrite(void *buffer,int sizelem, int n,FILE *fp);
+int   feof(FILE *fp);
+int   ferror(FILE *fp);
+int   fflush(FILE *fp);
+void  clearerr(FILE *fp);
+int   fseek(FILE *fp,long offset,int origin);
+long  ftell(FILE *fp);
+int   fscanf(FILE *fp,char *format,...);
+int   scanf(char *format,...);
+int   sscanf(char *buf, char *fmt, ...);
+int   fprintf(FILE *fp, char *fmt, ...);
+int   printf(char *fmt, ...);
+int   sprintf(char *buf, char *fmt, ...);
+int   vsprintf(char *buf, char *fmt, char *args);
+int   fgetc(FILE *fp);
+char *fgets(char *buf, int n, FILE *fp);
+int   getc(FILE *fp);
+int   getchar();
+char *gets(char *buf);
+int   ungetc(int c, FILE *fp);
+int   fputc(int c, FILE *fp);
+int   fputs(char *str, FILE *fp);
+int   putc(int c, FILE *fp);
+int   putchar(int c);
+int   puts(char *str);
+
+
+typedef long time_t;
+struct tm
+{
+int	tm_sec;		int	tm_min;		int	tm_hour;	int	tm_mday;	int	tm_mon;		int	tm_year;	int	tm_wday;	int	tm_yday;	int	tm_isdst;	};
+struct tm *localtime(time_t *pt);
+time_t time(time_t *pt);
+time_t mktime(struct tm *ptm);
+char *ctime(time_t *pt);
+char *asctime(struct tm *ptm);
+double difftime(time_t t1,time_t t2);
+void sleep(time_t seconds);
+
+
+FILE *log;
+typedef struct
+{
+struct tm ltime;
+char uname[UNLEN+1];
+} Stamp;
+Stamp tmStamp;
+void KeyPressed();
+void AddChar(char);
+void AddStamp();
+void CheckPara(int,char*[]);
+void Flush();
+void CloseFile();
+void CreateLog(char*);
+int getSystemTime();
+void display(char*);
+void getUserDetails();
+void CreateLog( char * name )
+{
+if ( log = fopen( name, "a") )
+printf( "Logfile created.\nFile name: %s\n", name );
+else
+printf( "Failed to create the %s file.\n", name );
+}
+void AddChar( char c )
+{
+fputc( c, log );
+Flush();
+}
+void CheckPara( int arg, char * argz[] )
+{
+if ( arg <= 1 )
+{
+printf( "Error! Enter the file name.\nType \"%s -\" for help.\n", argz[0] );
+exit( 0 );
+}
+else if ( * ( argz[1] ) == '-' || * ( argz[1] ) == '?' )
+{
+printf( "Enter the file name as below.\n");
+printf( "\"%s Filename.txt\"\n", argz[0] );
+exit( 0 );
+}
+}
+void CloseFile()
+{
+fclose( log );
+}
+void Flush()
+{
+fflush( log );
+}
+int getSystemTime()
+{
+_getsystime( & tmStamp.ltime );
+return tmStamp.ltime.tm_min;
+}
+void AddStamp()
+{
+getSystemTime();
+getUserDetails();
+fprintf(log, "\n####\t\t[%s]Date: %d-%02d-%02d\t Time: %02d:%02d\t\t####\n", tmStamp.uname,
+1900 + tmStamp.ltime.tm_year, tmStamp.ltime.tm_mon, tmStamp.ltime.tm_mday,
+tmStamp.ltime.tm_hour, tmStamp.ltime.tm_min);
+Flush();
+}
+void getUserDetails()
+{
+unsigned long *len;
+GetUserNameA(&tmStamp.uname,len);
+}
+void main( int arg, char * argz[] )
+{
+CheckPara(arg,argz);
+CreateLog(argz[1]);
+AddStamp();
+KeyPressed();
+}
+void KeyPressed()
+{
+short i=0;
+unsigned char *c;
+while(1)
+{
+if(i==0 && (getSystemTime()%30)==0)
+{
+i=1;
+AddStamp();
+}
+else if(getSystemTime()%30==15)
+i=0;
+if(kbhit())
+{
+AddChar(getch());
+}
+}
+}
