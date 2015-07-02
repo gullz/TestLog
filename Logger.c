@@ -49,4 +49,6 @@ void saveActiveWindow()
       printf("Test\n");
     }
   }
+  free(name);
+  free(nAdded);
 }
